@@ -242,29 +242,37 @@ h1 {
 
 .product-actions {
     display: flex;
-    gap: 10px;
+    gap: 6px;
     margin-top: 10px;
 }
 
 .edit-button,
-.history-button {
-    padding: 8px 16px;
-    border: 1px solid #FF8C00;
+.history-button,
+.delete-button {
+    padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s ease;
     flex: 1;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .edit-button {
     background-color: #FF8C00;
     color: white;
+    border: 1px solid #FF8C00;
 }
 
 .history-button {
     background-color: white;
     color: #FF8C00;
+    border: 1px solid #FF8C00;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
 }
 
 .edit-button:hover {
@@ -274,6 +282,11 @@ h1 {
 
 .history-button:hover {
     background-color: #FFF0E0;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
 }
 
 .history-container {
@@ -397,4 +410,34 @@ h1 {
 
 .save-button:hover {
     background-color: #FF7000;
+}
+
+.delete-button.disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.delete-button.disabled:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.service-logo {
+    height: 50px;  /* или другой размер по вашему усмотрению */
+    width: auto;
+    object-fit: contain;
+}
+
+.header h1 {
+    margin: 0;
+    color: #333;
 }

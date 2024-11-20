@@ -255,7 +255,7 @@
     {
       "id": "73",
       "title": "Моторное масло Helix Ultra Pro AM-L 550046353",
-      "cost": 3429.27,
+      "cost": 3239.23,
       "description": "Ахуительное масло",
       "mainimagepath": "https://amagspb.ru/files/uploads/pictures/_.jpg",
       "manufacturerid": 20,
@@ -278,15 +278,6 @@
       "mainimagepath": "Товары автосервиса\\B790A6AA.jpg",
       "manufacturerid": 21,
       "isactive": 0
-    },
-    {
-      "id": "9",
-      "title": "Моторное масло Mobil 1 ESP 154285",
-      "cost": 2890,
-      "description": null,
-      "mainimagepath": "Товары автосервиса\\F490E078.jpg",
-      "isactive": 1,
-      "manufacturerid": 40
     },
     {
       "id": "11",
@@ -1027,15 +1018,6 @@
       "manufacturerid": 33
     },
     {
-      "id": "89",
-      "title": "Моторное масло SN 08880-10706",
-      "cost": 1640,
-      "description": null,
-      "mainimagepath": "Товары автосервиса\\43C09176.jpg",
-      "isactive": 1,
-      "manufacturerid": 9
-    },
-    {
       "id": "90",
       "title": "Моторное масло Dexos 2 19 42 003",
       "cost": 1490,
@@ -1133,6 +1115,15 @@
       "mainimagepath": "Товары автосервиса\\3970E753.jpg",
       "isactive": 0,
       "manufacturerid": 26
+    },
+    {
+      "id": "1e52",
+      "title": "масло сливочное",
+      "cost": 213,
+      "description": "володя",
+      "mainimagepath": "https://www.cstore.ru/pictures/products/big/sintec_luxe_5000_5w_40_4l_2.jpg",
+      "manufacturerid": 1,
+      "isactive": 1
     }
   ],
   "productsale": [

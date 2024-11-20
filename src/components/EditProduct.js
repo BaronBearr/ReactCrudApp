@@ -16,7 +16,6 @@ const EditProduct = () => {
     const [imagePreview, setImagePreview] = useState('');
 
     useEffect(() => {
-        // Загружаем данные производителей и продукта
         const fetchData = async () => {
             try {
                 const [manufacturersResponse, productResponse] = await Promise.all([
@@ -24,8 +23,16 @@ const EditProduct = () => {
                     fetch(`http://localhost:8000/product/${id}`)
                 ]);
 
+                if (!manufacturersResponse.ok || !productResponse.ok) {
+                    throw new Error('Ошибка при загрузке данных');
+                }
+
                 const manufacturersData = await manufacturersResponse.json();
                 const productData = await productResponse.json();
+
+                if (!productData) {
+                    throw new Error('Товар не найден');
+                }
 
                 setManufacturers(manufacturersData);
                 setFormData({
@@ -39,12 +46,13 @@ const EditProduct = () => {
                 setImagePreview(getImageUrl(productData.mainimagepath));
             } catch (error) {
                 console.error('Ошибка загрузки данных:', error);
-                alert('Ошибка при загрузке данных');
+                alert('Ошибка при загрузке данных товара. Возможно, товар не существует.');
+                navigate('/');
             }
         };
 
         fetchData();
-    }, [id]);
+    }, [id, navigate]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -86,22 +94,21 @@ const EditProduct = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!/^\d+(\.\d+)?$/.test(formData.cost) || parseFloat(formData.cost) <= 0) {
-            alert("Цена товара должна быть положительным числом.");
-            return;
-        }
-
-        const updatedProduct = {
-            id: parseInt(id),
-            title: formData.title,
-            cost: parseFloat(formData.cost),
-            description: formData.description || null,
-            mainimagepath: formData.mainimagepath,
-            manufacturerid: parseInt(formData.manufacturerid),
-            isactive: formData.isactive ? 1 : 0
-        };
-
         try {
+            if (!/^\d+(\.\d+)?$/.test(formData.cost) || parseFloat(formData.cost) <= 0) {
+                throw new Error("Цена товара должна быть положительным числом.");
+            }
+
+            const updatedProduct = {
+                id: parseInt(id),
+                title: formData.title.trim(),
+                cost: parseFloat(formData.cost),
+                description: formData.description?.trim() || null,
+                mainimagepath: formData.mainimagepath?.trim(),
+                manufacturerid: parseInt(formData.manufacturerid),
+                isactive: formData.isactive ? 1 : 0
+            };
+
             const response = await fetch(`http://localhost:8000/product/${id}`, {
                 method: 'PUT',
                 headers: {
@@ -117,8 +124,8 @@ const EditProduct = () => {
             alert('Товар успешно обновлен!');
             navigate('/');
         } catch (error) {
-            console.error('Ошибка обновления товара:', error);
-            alert('Произошла ошибка при обновлении товара');
+            console.error('Ошибка операции:', error);
+            alert(error.message || 'Произошла ошибка при обновлении товара. Пожалуйста, проверьте введенные данные.');
         }
     };
 

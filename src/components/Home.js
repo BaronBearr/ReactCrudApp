@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { getImageUrl } from '../utils/imageUtils';
 import { useNavigate } from 'react-router-dom';
+import serviceLogo from '../Logo/service_logo.png';
 
 const Home = () => {
     const [manufacturers, setManufacturers] = useState([]);
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
+    const [originalOrder, setOriginalOrder] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedManufacturer, setSelectedManufacturer] = useState('');
     const [sortOrder, setSortOrder] = useState('');
@@ -25,6 +27,7 @@ const Home = () => {
                 setManufacturers(manufacturersData);
                 setProducts(productsData);
                 setFilteredProducts(productsData);
+                setOriginalOrder(productsData);
             } catch (error) {
                 console.error('Ошибка загрузки данных:', error);
             }
@@ -33,20 +36,8 @@ const Home = () => {
         fetchData();
     }, []);
 
-    const handleSearch = (event) => {
-        const query = event.target.value.toLowerCase();
-        setSearchQuery(query);
-        filterProducts(query, selectedManufacturer);
-    };
-
-    const handleManufacturerFilter = (event) => {
-        const manufacturer = event.target.value;
-        setSelectedManufacturer(manufacturer);
-        filterProducts(searchQuery, manufacturer);
-    };
-
-    const filterProducts = (query, manufacturer) => {
-        let filtered = products;
+    const filterProducts = (query, manufacturer, sort = sortOrder) => {
+        let filtered = [...originalOrder];
         
         if (query) {
             filtered = filtered.filter(product => 
@@ -61,32 +52,31 @@ const Home = () => {
             );
         }
         
-        if (sortOrder === 'asc') {
+        if (sort === 'asc') {
             filtered.sort((a, b) => a.cost - b.cost);
-        } else if (sortOrder === 'desc') {
+        } else if (sort === 'desc') {
             filtered.sort((a, b) => b.cost - a.cost);
         }
         
         setFilteredProducts(filtered);
     };
 
-    const handleSort = (order) => {
-        if (order === sortOrder) {
-            setSortOrder('');
-            setFilteredProducts([...products]);
-            return;
-        }
+    const handleSearch = (event) => {
+        const query = event.target.value.toLowerCase();
+        setSearchQuery(query);
+        filterProducts(query, selectedManufacturer);
+    };
 
-        setSortOrder(order);
-        let sorted = [...filteredProducts];
-        
-        if (order === 'asc') {
-            sorted.sort((a, b) => a.cost - b.cost);
-        } else if (order === 'desc') {
-            sorted.sort((a, b) => b.cost - a.cost);
-        }
-        
-        setFilteredProducts(sorted);
+    const handleManufacturerFilter = (event) => {
+        const manufacturer = event.target.value;
+        setSelectedManufacturer(manufacturer);
+        filterProducts(searchQuery, manufacturer);
+    };
+
+    const handleSort = (order) => {
+        const newOrder = order === sortOrder ? '' : order;
+        setSortOrder(newOrder);
+        filterProducts(searchQuery, selectedManufacturer, newOrder);
     };
 
     const formatPrice = (price) => {
@@ -97,7 +87,7 @@ const Home = () => {
     };
 
     const openForm = () => {
-        console.log("Открытие формы добавления товара");
+        navigate('/create');
     };
 
     const handleEdit = (productId) => {
@@ -108,9 +98,46 @@ const Home = () => {
         navigate(`/history/${productId}`);
     };
 
+    const handleDelete = async (productId) => {
+        try {
+            const salesResponse = await fetch('http://localhost:8000/productsale');
+            const salesData = await salesResponse.json();
+            
+            const hasSales = salesData.some(sale => sale.productid === productId);
+            
+            if (hasSales) {
+                alert('Невозможно удалить товар, так как у него есть история продаж');
+                return;
+            }
+
+            if (window.confirm('Вы уверены, что хотите удалить этот товар?')) {
+                const response = await fetch(`http://localhost:8000/product/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при удалении товара');
+                }
+
+                setProducts(products.filter(product => product.id !== productId));
+                setFilteredProducts(filteredProducts.filter(product => product.id !== productId));
+                alert('Товар успешно удален!');
+            }
+        } catch (error) {
+            console.error('Ошибка удаления товара:', error);
+            alert('Произошла ошибка при удалении товара');
+        }
+    };
+
     return (
         <div className="container">
-            <h1>Список товаров</h1>
+            <div className="header">
+                <img src={serviceLogo} alt="Service Logo" className="service-logo" />
+                <h1>Товары автосервиса</h1>
+            </div>
             
             <div className="controls">
                 <div className="search-box">
@@ -196,6 +223,9 @@ const Home = () => {
                                 </button>
                                 <button className="history-button" onClick={() => handleHistory(product.id)}>
                                     История
+                                </button>
+                                <button className="delete-button" onClick={() => handleDelete(product.id)}>
+                                    Удалить
                                 </button>
                             </div>
                         </div>
